@@ -14,11 +14,8 @@ use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
+    // get all contacts
     public function index()
     {
         try {
@@ -34,6 +31,7 @@ class ContactController extends Controller
 
     }
 
+    // get a single contact
     public function show($id) {
         try {
             $contact = Contact::find($id);
@@ -56,11 +54,59 @@ class ContactController extends Controller
             return response(['data' => new ContactResource($contact)], 200);
         }
         catch ( Exception $e) {
-            echo $e; 
+            
             return response() -> json([
                 "message" => "Error Getting Contact" 
             ], 500 ); 
         }
 
+    }
+
+    // edit a contact 
+    public function update(Request $request, $id) {
+        try {
+
+            $requestData = $request->all();
+
+        $firstname = $requestData['firstname'];
+        $lastname = $requestData['lastname'];
+        $company = $requestData['company'];
+        $email = $requestData['email'];
+
+        // Check if the company exists
+        $companyData = Company::find($company["id"]); 
+        if (!$companyData) {
+            return response()->json([
+                "message" => "Company not found"
+            ], 404);
+        }
+
+        $contact = Contact::findOrFail($id);
+
+        // Update the contact data
+        $contact->firstname = $firstname;
+        $contact->lastname = $lastname;
+        $contact->email = $email;
+
+        // Associate the contact with the company
+        $contact->company_id = $company["id"] ;
+
+        $contact->save();
+
+        return response()->json([
+            "message" => "Contact updated successfully" , 
+            "contact" => $contact , 
+            "id" => $company["id"]
+        ], 200);
+           
+
+        }
+        catch ( Exception $e ) {
+            ;
+            return response() -> json([
+                "message" => "Error Updating Contact" ,
+                "err" => $e -> getMessage()
+            ], 500 ); 
+        }
     }
 }
