@@ -102,7 +102,50 @@ class ContactController extends Controller
 
         }
         catch ( Exception $e ) {
-            ;
+            
+            return response() -> json([
+                "message" => "Error Updating Contact" ,
+                "err" => $e -> getMessage()
+            ], 500 ); 
+        }
+    }
+
+    // add a new contact to the database 
+    public function add(Request $request ) {
+        try {
+            $validatedData = $request-> validate([
+                'firstname' => 'required|string|max:255' , 
+                'lastname' => 'required|string|max:255' , 
+                'email' => 'required|string|max:255' , 
+                'company' => 'required|string|max:255' , 
+            ]); 
+
+            $contactCount = Contact::count() ; 
+            $contactCount += 1 ; 
+
+            $contact = new Contact ; 
+            $contact -> id = $contactCount ; 
+            $contact -> firstname = $validatedData['firstname'] ; 
+            $contact -> lastname = $validatedData['lastname'] ; 
+            $contact -> email = $validatedData['email'] ; 
+            
+
+            $company = Company::find($validatedData['company']); 
+            if ( !$company ) {
+                return response()-> json([
+                    'message' => "Invalid Company" , 
+                    'details' => $validatedData['company'] 
+
+                ], 400); 
+            } 
+
+            $contact -> company_id = $company['id']; 
+            $contact -> save() ; 
+            return response()->json([
+                'message' => 'Contact Created' ,  
+            ], 200); 
+        }
+        catch ( Exception $e ) {
             return response() -> json([
                 "message" => "Error Updating Contact" ,
                 "err" => $e -> getMessage()
