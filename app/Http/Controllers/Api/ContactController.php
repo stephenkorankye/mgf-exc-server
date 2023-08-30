@@ -24,7 +24,8 @@ class ContactController extends Controller
         }
         catch ( Exception $e ) {
             return response() -> json([
-                "message" => "Could not fetch contacts" 
+                "message" => "Could not fetch contacts", 
+                "err" => $e -> getMessage() 
             ], 500 ); 
         }
         
@@ -56,7 +57,8 @@ class ContactController extends Controller
         catch ( Exception $e) {
             
             return response() -> json([
-                "message" => "Error Getting Contact" 
+                "message" => "Error Getting Contact", 
+                "err" => $e -> getMessage()
             ], 500 ); 
         }
 

@@ -42,7 +42,8 @@ class CompanyController extends Controller
         }
         catch ( Exception $e ) {
             return response() -> json([
-                "message" => "Could not fetch companies" 
+                "message" => "Could not fetch companies" , 
+                "err" => $e -> getMessage() 
             ], 500 ); 
         }
         
